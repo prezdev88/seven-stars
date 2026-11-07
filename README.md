@@ -15,6 +15,10 @@ Abre `index.html` en un navegador moderno. No necesitas instalar dependencias ni
 
 Elige entre Namu, Jino, Yuno, Hobi, Jiminie, Taeo y Kookie para comenzar la carrera.
 
+Recoge una **Army Bomb dorada** para invocar a **Mister Lee** durante siete segundos. Entra con un anuncio y fanfarria, corre delante de ti y elimina automáticamente a las armys, incluso cuando saltan. La escolta incluye la protección dorada del personaje y un contador de tiempo y enemigas despejadas. Otro objeto dorado renueva la duración; pausar congela también la escolta.
+
+**Personaje secreto:** escribe `misterlee` en la selección de personajes para desbloquearlo y jugar con él. También puedes abrir «Código secreto» y escribirlo ahí, incluso desde el móvil. El desbloqueo queda guardado en ese navegador. Si Mister Lee recoge una Army Bomb dorada, aparece uno de los siete chicos al azar como escolta, con sus propias animaciones, retrato y nombre.
+
 ## Controles
 
 - **Computador:** pulsa Espacio o la flecha hacia arriba para saltar; pulsa Esc para pausar o continuar.

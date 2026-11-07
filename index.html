@@ -27,7 +27,7 @@
                     <section class="hud-panel hud-player">
                         <span class="hud-label">TU AVENTURA</span>
                         <span id="hearts" class="hearts" role="status" aria-label="3 corazones">♥ ♥ ♥</span>
-                        <span id="power" class="power" hidden aria-label="Invencibilidad restante"></span>
+                        <span id="power" class="power" hidden aria-label="Protección del aliado restante"></span>
                         <div class="hud-score-row"><span class="hud-bomb" aria-hidden="true">✦</span><strong id="score">0</strong><span class="hud-caption">ESTRELLAS</span></div>
                     </section>
                     <section class="hud-panel hud-stage">
@@ -37,6 +37,20 @@
                         <div class="hud-meta"><small id="speed" aria-label="Multiplicador de velocidad">1,0×</small><small id="lives" aria-label="Continuaciones restantes">↻ 3</small></div>
                     </section>
                 </div>
+                <div class="lee-entrance" id="lee-entrance" hidden aria-hidden="true">
+                    <img id="lee-portrait" alt="">
+                    <div class="lee-entrance-copy">
+                        <span>✦ REFUERZO LEGENDARIO</span>
+                        <strong id="ally-name">MISTER LEE</strong>
+                        <small id="ally-motto">TRANQUILO. YO ME ENCARGO.</small>
+                    </div>
+                </div>
+                <div class="lee-status" id="lee-status" hidden>
+                    <div><strong id="ally-status-name">✦ MISTER LEE</strong><span id="lee-time">7s</span></div>
+                    <small id="lee-cleared">0 ARMYS FUERA</small>
+                    <div class="lee-track"><span id="lee-meter"></span></div>
+                </div>
+                <span class="sr-only" id="lee-announcement" role="status" aria-live="polite" aria-atomic="true"></span>
                 <div class="welcome" id="welcome">
                     <span class="scene-label"><span></span> UN UNIVERSO POR DESCUBRIR</span>
                     <div class="welcome-content">
@@ -106,7 +120,21 @@
                                 <strong>KOOKIE</strong>
                                 <small>SELECCIONAR</small>
                             </button>
+                            <button class="character secret-character" id="misterlee-choice" type="button" aria-pressed="false" aria-label="Seleccionar Mister Lee" hidden>
+                                <span class="portrait"><img src="images/portraits/mister-lee-portrait.png" alt=""></span>
+                                <strong>MISTER LEE</strong>
+                                <small>SELECCIONAR</small>
+                            </button>
                         </div>
+                        <details class="secret-unlock" id="secret-unlock">
+                            <summary>Código secreto</summary>
+                            <form id="secret-form">
+                                <label class="sr-only" for="secret-code">Código secreto de personaje</label>
+                                <input id="secret-code" type="text" placeholder="Escribe tu código" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="32" enterkeyhint="go">
+                                <button type="submit">ACTIVAR</button>
+                            </form>
+                        </details>
+                        <div class="unlock-message" id="unlock-message" role="status" aria-live="polite"></div>
                         <button class="primary-button" id="continue" hidden>CONTINUAR <span>→</span></button>
                         <button class="primary-button" id="start">¡JUGAR!</button>
                         <div class="hint">DOBLE TOQUE O DOS PULSACIONES PARA DOBLE SALTO</div>

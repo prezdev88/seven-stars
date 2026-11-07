@@ -444,6 +444,106 @@ kbd {
     overflow: hidden;
     clip-path: inset(50%);
 }
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+.lee-entrance {
+    position: absolute;
+    z-index: 3;
+    top: 25%;
+    left: 0;
+    width: 100%;
+    height: clamp(125px, 24vh, 195px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 3vw, 32px);
+    border-block: 1px solid #ffe3a295;
+    background: linear-gradient(90deg, #14102100, #21152cf2 20%, #21152cf2 80%, #14102100);
+    box-shadow: 0 0 45px #ffc94a24, inset 0 1px #fff0be25;
+    pointer-events: none;
+}
+.lee-entrance img {
+    height: 125%;
+    width: auto;
+    max-width: 35%;
+    object-fit: contain;
+    align-self: flex-end;
+    filter: drop-shadow(0 0 14px #ffce5966);
+    image-rendering: pixelated;
+}
+.lee-entrance-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 10px;
+}
+.lee-entrance-copy > span {
+    color: #f5d28f;
+    font-size: clamp(7px, 1.7vw, 10px);
+    letter-spacing: .2em;
+}
+.lee-entrance-copy strong {
+    color: #fff0be;
+    font-size: clamp(22px, 5.5vw, 46px);
+    font-style: italic;
+    line-height: 1;
+    text-shadow: 0 2px #9a6029, 0 0 25px #ffd66a55;
+    white-space: nowrap;
+}
+.lee-entrance-copy small {
+    color: #d6c5dd;
+    font-size: clamp(7px, 1.5vw, 9px);
+    letter-spacing: .12em;
+}
+.lee-status {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    bottom: 5%;
+    transform: translateX(-50%);
+    width: min(240px, 72%);
+    padding: 11px 16px;
+    border: 1px solid #eac37365;
+    border-radius: 10px;
+    color: #ffe3a2;
+    background: #1b142ce8;
+    box-shadow: 0 0 25px #ffc94a15;
+    pointer-events: none;
+}
+.lee-status > div:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 11px;
+    letter-spacing: .08em;
+}
+.lee-status small {
+    display: block;
+    margin-top: 5px;
+    color: #c5b5cf;
+    font-size: 8px;
+    letter-spacing: .12em;
+}
+.lee-track {
+    height: 3px;
+    margin-top: 8px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #f9dba12b;
+}
+.lee-track span {
+    display: block;
+    height: 100%;
+    transform-origin: left;
+    background: linear-gradient(90deg, #c48a32, #fff0af);
+}
 .pause {
     position: absolute;
     z-index: 6;
@@ -649,7 +749,7 @@ h1 em {
 }
 .characters {
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--character-columns, 7), minmax(0, 1fr));
     gap: 10px;
     margin: 20px 0 10px;
 }
@@ -702,6 +802,51 @@ h1 em {
 }
 .character[aria-pressed="true"] small {
     color: var(--gold);
+}
+.secret-character {
+    border-color: #eac37380;
+    background: #f0d49b0c;
+}
+.secret-unlock {
+    margin: 8px auto 0;
+    max-width: 300px;
+    color: #b6a5ca;
+    font-size: 10px;
+}
+.secret-unlock summary {
+    cursor: pointer;
+    padding: 4px;
+}
+.secret-unlock form {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+}
+.secret-unlock input {
+    min-width: 0;
+    flex: 1;
+    padding: 9px;
+    border: 1px solid #dbc6ff40;
+    border-radius: 7px;
+    color: #fff0ce;
+    background: #100c29;
+    font-size: 16px;
+}
+.secret-unlock button {
+    padding: 8px 10px;
+    border: 1px solid #eac37365;
+    border-radius: 7px;
+    color: var(--gold);
+    background: #f0d49b0c;
+    font-size: 9px;
+}
+.unlock-message {
+    color: var(--gold);
+    font-size: 9px;
+    letter-spacing: .08em;
+}
+.unlock-message:not(:empty) {
+    margin-top: 8px;
 }
 @keyframes companions-float {
     50% {
@@ -967,7 +1112,7 @@ h1 em {
         display: none;
     }
     .characters {
-        grid-template-columns: repeat(7, minmax(0, 1fr));
+        grid-template-columns: repeat(var(--character-columns, 7), minmax(0, 1fr));
     }
     .fighter-preview {
         height: 100px;
