@@ -25,6 +25,9 @@ suga.src = "images/sprites/yuno-run.png";
 tae.src = "images/sprites/taeo-run.png";
 bomb.src = "images/sprites/army-bomb.png";
 rival.src = "images/sprites/rival.png";
+const scenery = new Image();
+scenery.src = "images/backgrounds/starlit-valley.webp";
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 const previewCanvas = document.querySelector("#preview-canvas"),
     previewCtx = previewCanvas.getContext("2d");
 const BOMBS_PER_STAGE = 5;
@@ -83,14 +86,6 @@ const tintCanvas = document.createElement("canvas");
 tintCanvas.width = 490;
 tintCanvas.height = 1010;
 const tintCtx = tintCanvas.getContext("2d");
-const stars = Array.from(
-    { length: 42 },
-    (_, i) => ({
-        x: (i * 127 + 29) % 480,
-        y: (i * 83 + 17) % 430,
-        s: i % 7 === 0 ? 3 : 1,
-    }),
-);
 function updatePowerHUD() {
     let indicator = document.querySelector("#power");
     indicator.hidden = powerTime <= 0;
@@ -202,7 +197,9 @@ function showSelection() {
     continueBtn.hidden = true;
     selectCharacter(selectedCharacter);
 }
+let startingRun = false;
 function start() {
+    if (startingRun || switchingScene) return;
     if (!showingSelection) {
         showSelection();
         return;
@@ -212,33 +209,95 @@ function start() {
     resumeRun();
 }
 function continueRun() {
-    if (continuesLeft <= 0 || running) return;
+    if (continuesLeft <= 0 || running || startingRun) return;
     cancelContinueCountdown();
     continuesLeft--;
     safeStart();
     showProgress();
     resumeRun();
 }
-function resumeRun() {
+async function resumeRun() {
+    if (startingRun || running) return;
+    startingRun = true;
     continueBtn.hidden = true;
-    running = true;
     paused = false;
     last = 0;
     overlay.hidden = true;
+    pauseBtn.hidden = true;
+    document.querySelector("#paused").hidden = true;
+    draw();
+
+    const countdown = document.querySelector("#start-countdown");
+    const value = document.querySelector("#countdown-value");
+    countdown.hidden = false;
+    countdown.focus({ preventScroll: true });
+    for (const step of ["3", "2", "1", "¡GO!"]) {
+        value.textContent = step;
+        countdown.classList.toggle("countdown-go", step === "¡GO!");
+        if (!reducedMotion.matches) {
+            value.animate(
+                [
+                    { opacity: 0, transform: "scale(.8)" },
+                    { opacity: 1, transform: "scale(1)" },
+                ],
+                { duration: 250, easing: "ease-out" },
+            );
+        }
+        await new Promise((resolve) =>
+            setTimeout(resolve, step === "¡GO!" ? 550 : 1000)
+        );
+    }
+    countdown.hidden = true;
+    startingRun = false;
+    running = true;
     pauseBtn.hidden = false;
     pauseBtn.textContent = "Ⅱ";
     pauseBtn.setAttribute("aria-label", "Pausar juego");
-    document.querySelector("#paused").hidden = true;
+    pauseBtn.focus({ preventScroll: true });
     requestAnimationFrame(loop);
 }
-document.querySelector("#welcome-play").addEventListener("click", () => {
-    document.querySelector("#welcome").hidden = true;
-    distance = 0;
-    draw();
-    overlay.hidden = false;
-    showSelection();
-    document.querySelector("#" + selectedCharacter + "-choice").focus();
-});
+let switchingScene = false;
+async function openCharacterSelection() {
+    if (switchingScene || document.querySelector("#welcome").hidden) return;
+    switchingScene = true;
+    const game = document.querySelector(".game");
+    const curtain = document.querySelector("#scene-transition");
+    game.inert = true;
+    curtain.hidden = false;
+
+    async function fade(from, to, duration) {
+        if (reducedMotion.matches) {
+            curtain.style.opacity = to;
+            return;
+        }
+        const animation = curtain.animate(
+            [{ opacity: from }, { opacity: to }],
+            { duration, easing: "ease-in-out", fill: "forwards" },
+        );
+        await animation.finished;
+        curtain.style.opacity = to;
+        animation.cancel();
+    }
+
+    try {
+        await fade(0, 1, 350);
+        document.querySelector("#welcome").hidden = true;
+        distance = 0;
+        draw();
+        overlay.hidden = false;
+        showSelection();
+        await fade(1, 0, 450);
+    } finally {
+        curtain.hidden = true;
+        game.inert = false;
+        switchingScene = false;
+        document.querySelector("#" + selectedCharacter + "-choice").focus();
+    }
+}
+document.querySelector("#welcome-play").addEventListener(
+    "click",
+    openCharacterSelection,
+);
 document.querySelector("#jimin-choice").addEventListener(
     "click",
     () => selectCharacter("jimin"),
@@ -533,72 +592,120 @@ function update(dt) {
     }
     if (player.y > H + 100) end();
 }
-function draw() {
-    let palettes = [
-        ["#281544", "#704589", "#d491b9", "#563d76", "#3c2b60"],
-        ["#102c50", "#356f89", "#91d8d4", "#315c79", "#20435f"],
-        ["#48254b", "#a44e70", "#ffc293", "#7e425f", "#56334f"],
-        ["#172e42", "#476c66", "#c1bf83", "#42665f", "#2a4d4c"],
-    ];
-    let colors = palettes[(stage - 1) % palettes.length];
-    let bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, colors[0]);
-    bg.addColorStop(.55, colors[1]);
-    bg.addColorStop(1, colors[2]);
-    ctx.fillStyle = bg;
+// The world moves at different speeds to give the valley depth.
+function drawScenery() {
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, "#151333");
+    sky.addColorStop(1, "#68608c");
+    ctx.fillStyle = sky;
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "#fff7dc";
-    ctx.beginPath();
-    ctx.arc(W - 100, 135, 39, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#ffd9f044";
-    ctx.beginPath();
-    ctx.arc(W - 100, 135, 52, 0, Math.PI * 2);
-    ctx.fill();
-    stars.forEach((s) => {
-        ctx.fillStyle = "#fff8";
-        ctx.fillRect(
-            (s.x * W / 480 - distance * .025 + 50000) % W,
-            s.y,
-            s.s,
-            s.s,
+
+    if (scenery.complete && scenery.naturalWidth) {
+        ctx.imageSmoothingEnabled = true;
+        const scale =
+            Math.max(W / scenery.naturalWidth, H / scenery.naturalHeight) *
+            1.08;
+        const width = scenery.naturalWidth * scale;
+        const height = scenery.naturalHeight * scale;
+        // Drift gently left and stop at the image edge, without reversing direction.
+        const offset = reducedMotion.matches
+            ? 0
+            : Math.min(distance * .008, (width - W) / 2);
+        ctx.drawImage(
+            scenery,
+            -(width - W) / 2 - offset,
+            -(height - H) * .45,
+            width,
+            height,
         );
-    });
-    ctx.fillStyle = colors[3];
-    for (let i = -2; i < Math.ceil(W / 110) + 2; i++) {
-        let x = i * 110 - (distance * .13 % 220);
+    }
+    const washes = ["#29154c14", "#10455b26", "#76374726", "#285c4d26"];
+    ctx.fillStyle = washes[(stage - 1) % washes.length];
+    ctx.fillRect(0, 0, W, H);
+
+    // Small lights float above the path, independent of collectible stars.
+    ctx.save();
+    for (let i = 0; i < 25; i++) {
+        const x = ((i * 157 - distance * .12) % (W + 80) + W + 80) % (W + 80) -
+            40;
+        const drift = reducedMotion.matches
+            ? 0
+            : Math.sin(distance / 180 + i * 2) * 10;
+        const y = 225 + (i * 73) % 310 + drift;
+        ctx.globalAlpha = .2 + (Math.sin(i + distance / 150) + 1) * .2;
+        ctx.fillStyle = i % 3 ? "#e8d59c" : "#9ae6da";
         ctx.beginPath();
-        ctx.moveTo(x, 500);
-        ctx.lineTo(x + 75, 310 + (i % 2) * 35);
-        ctx.lineTo(x + 155, 500);
+        ctx.arc(x, y, i % 4 === 0 ? 2 : 1, 0, Math.PI * 2);
         ctx.fill();
     }
-    ctx.fillStyle = colors[4];
-    for (let i = -2; i < Math.ceil(W / 110) + 2; i++) {
-        let x = i * 110 - (distance * .25 % 220);
+    ctx.restore();
+}
+
+function drawPlatform(platform, y, floating = false) {
+    const height = floating ? 25 : H - y;
+    const earth = ctx.createLinearGradient(0, y, 0, y + height);
+    earth.addColorStop(0, "#38324c");
+    earth.addColorStop(.22, "#26243b");
+    earth.addColorStop(1, "#17172c");
+    ctx.fillStyle = earth;
+    ctx.fillRect(platform.x, y, platform.w, height);
+    ctx.fillStyle = "#877397";
+    ctx.fillRect(platform.x, y, platform.w, 4);
+    ctx.fillStyle = "#b9a3c2";
+    ctx.fillRect(platform.x, y, platform.w, 1);
+    ctx.fillStyle = "#51435e";
+    ctx.fillRect(platform.x, y + 4, platform.w, 7);
+
+    // Clipped stones and grasses remain attached to their platform as it scrolls.
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(platform.x, y - 8, platform.w, height + 8);
+    ctx.clip();
+    for (let offset = 12; offset < platform.w; offset += 31) {
+        const x = platform.x + offset;
+        ctx.fillStyle = offset % 2 ? "#635069" : "#463b55";
+        ctx.fillRect(x, y + 17 + (offset % 17), 9, 3);
+        ctx.strokeStyle = "#9380a1";
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(x, 540);
-        ctx.lineTo(x + 75, 385 + (i % 2) * 30);
-        ctx.lineTo(x + 155, 540);
-        ctx.fill();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - 3, y - 5);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + 2, y - 7);
+        ctx.stroke();
     }
-    let groundPalettes = [["#27463e", "#669b6e"], ["#244959", "#69a9a1"], [
-        "#5b5143",
-        "#a8a66c",
-    ], ["#304a3f", "#80a474"]];
-    let ground = groundPalettes[(stage - 1) % groundPalettes.length];
-    platforms.forEach((p) => {
-        ctx.fillStyle = ground[0];
-        ctx.fillRect(p.x, G, p.w, H - G);
-        ctx.fillStyle = ground[1];
-        ctx.fillRect(p.x, G, p.w, 10);
-    });
-    ledges.forEach((p) => {
-        ctx.fillStyle = ground[0];
-        ctx.fillRect(p.x, p.y, p.w, 17);
-        ctx.fillStyle = ground[1];
-        ctx.fillRect(p.x, p.y, p.w, 6);
-    });
+    ctx.restore();
+}
+
+function draw() {
+    drawScenery();
+    platforms.forEach((platform) => drawPlatform(platform, G));
+    ledges.forEach((platform) => drawPlatform(platform, platform.y, true));
+
+    if (document.querySelector("#welcome").hidden && player.grounded) {
+        ctx.save();
+        ctx.fillStyle = "#08071955";
+        ctx.beginPath();
+        ctx.ellipse(player.x, player.y - 1, 30, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        if (running && !reducedMotion.matches) {
+            for (let i = 0; i < 5; i++) {
+                const phase = (distance / 90 + i / 5) % 1;
+                ctx.globalAlpha = (1 - phase) * .3;
+                ctx.fillStyle = "#d5c2d9";
+                ctx.beginPath();
+                ctx.arc(
+                    player.x - 18 - phase * 45,
+                    player.y - 6 - phase * 12,
+                    2 + phase * 4,
+                    0,
+                    Math.PI * 2,
+                );
+                ctx.fill();
+            }
+        }
+        ctx.restore();
+    }
     enemies.forEach((enemy) => {
         if (rival.complete && rival.naturalWidth) {
             let frames = [0, 355, 1040, 355];
@@ -803,7 +910,7 @@ function draw() {
 
 function animateWelcome(ts) {
     if (document.querySelector("#welcome").hidden) return;
-    distance = ts * .035;
+    distance = reducedMotion.matches ? 0 : ts * .035;
     draw();
     requestAnimationFrame(animateWelcome);
 }
@@ -914,6 +1021,7 @@ function loop(ts) {
 }
 reset();
 resize();
+scenery.onload = draw;
 runSprite.onload = draw;
 jungkook.onload = draw;
 rm.onload = draw;

@@ -29,3 +29,11 @@ Elige entre Namu, Jino, Yuno, Hobi, Jiminie, Taeo y Kookie para comenzar la carr
 - `images/branding/`: logo e imagen de los personajes.
 - `images/portraits/`: retratos de selección.
 - `images/sprites/`: sprites de personajes y elementos del juego.
+
+- `images/backgrounds/`: escenarios ilustrados optimizados en WebP.
+
+## Diseño visual
+
+La interfaz combina tonos violeta y acentos dorados con un valle nocturno ilustrado. El escenario incluye luces ambientales, plataformas con textura, sombra del personaje y polvo al correr. La portada y la selección de compañeros se adaptan a escritorio, móvil y orientación horizontal. Las animaciones decorativas respetan la preferencia de movimiento reducido del dispositivo.
+
+El fondo `images/backgrounds/starlit-valley.webp` fue generado con la herramienta integrada imagegen y optimizado en WebP (aproximadamente 158 KiB). El prompt usado está documentado en [docs/art-direction.md](docs/art-direction.md).
