@@ -28,11 +28,11 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Abre `http://IP_DEL_VPS:8080`. El contenedor sirve el juego con Nginx, se reinicia automáticamente con Docker y comprueba periódicamente que la página responde. Los logs tienen rotación para limitar el espacio utilizado.
+Abre `http://IP_DEL_VPS:8765`. El contenedor sirve el juego con Nginx, se reinicia automáticamente con Docker y comprueba periódicamente que la página responde. Los logs tienen rotación para limitar el espacio utilizado.
 
 Para usar otro puerto, edita `APP_PORT` en `.env` y vuelve a ejecutar `docker compose up -d`. Por ejemplo, `APP_PORT=80` permite acceder mediante `http://IP_DEL_VPS` si el puerto 80 está disponible. Permite el puerto elegido en el firewall del VPS y del proveedor.
 
-Si ya tienes un proxy inverso en el VPS, puedes publicar solo en la interfaz local con `APP_PORT=127.0.0.1:8080` y dirigir el proxy a `http://127.0.0.1:8080`. Para servir el juego con dominio y HTTPS, configura el dominio y el certificado en ese proxy.
+Si ya tienes un proxy inverso en el VPS, puedes publicar solo en la interfaz local con `APP_PORT=127.0.0.1:8765` y dirigir el proxy a `http://127.0.0.1:8765`. Para servir el juego con dominio y HTTPS, configura el dominio y el certificado en ese proxy.
 
 Para revisar el estado y los logs:
 

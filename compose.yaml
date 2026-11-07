@@ -2,7 +2,7 @@ services:
   web:
     build: .
     ports:
-      - "${APP_PORT:-8080}:80"
+      - "${APP_PORT:-8765}:80"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--spider", "http://127.0.0.1/"]
