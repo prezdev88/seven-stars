@@ -19,6 +19,44 @@ Recoge una **Army Bomb dorada** para invocar a **Mister Lee** durante siete segu
 
 **Personaje secreto:** escribe `misterlee` en la selección de personajes para desbloquearlo y jugar con él. También puedes abrir «Código secreto» y escribirlo ahí, incluso desde el móvil. El desbloqueo queda guardado en ese navegador. Si Mister Lee recoge una Army Bomb dorada, aparece uno de los siete chicos al azar como escolta, con sus propias animaciones, retrato y nombre.
 
+## Desplegar en un VPS con Docker Compose
+
+Necesitas Docker Engine y el plugin Docker Compose instalados en el VPS. Copia o clona este repositorio en el servidor y, desde su carpeta, ejecuta:
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
+
+Abre `http://IP_DEL_VPS:8080`. El contenedor sirve el juego con Nginx, se reinicia automáticamente con Docker y comprueba periódicamente que la página responde. Los logs tienen rotación para limitar el espacio utilizado.
+
+Para usar otro puerto, edita `APP_PORT` en `.env` y vuelve a ejecutar `docker compose up -d`. Por ejemplo, `APP_PORT=80` permite acceder mediante `http://IP_DEL_VPS` si el puerto 80 está disponible. Permite el puerto elegido en el firewall del VPS y del proveedor.
+
+Si ya tienes un proxy inverso en el VPS, puedes publicar solo en la interfaz local con `APP_PORT=127.0.0.1:8080` y dirigir el proxy a `http://127.0.0.1:8080`. Para servir el juego con dominio y HTTPS, configura el dominio y el certificado en ese proxy.
+
+Para revisar el estado y los logs:
+
+```bash
+docker compose ps
+docker compose logs --tail=100 -f web
+```
+
+Para actualizar una instalación clonada con Git:
+
+```bash
+git pull --ff-only
+docker compose build --pull
+docker compose up -d
+```
+
+Para detenerla:
+
+```bash
+docker compose down
+```
+
+El progreso y el récord se guardan en el navegador de cada jugador; el servidor no necesita base de datos ni volúmenes persistentes.
+
 ## Controles
 
 - **Computador:** pulsa Espacio o la flecha hacia arriba para saltar; pulsa Esc para pausar o continuar.
